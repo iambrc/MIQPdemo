@@ -1,0 +1,11 @@
+The files in this directory allow you to build the Gurobi C++
+interface (gurobi_c++mt.lib) from source.  These files should only
+be used by advanced users.  We provide no technical support for the
+included source code, nor do we provide assistance in building or
+using the resulting library.
+
+To build gurobi_c++mt.lib, start a Developer Command Prompt for Visual
+Studio, change to the 'build' directory, and type 'nmake'.
+
+To use the result, modify your project file to link with
+'gurobi_c++mt.lib' (which you'll find in the 'build' directory).
