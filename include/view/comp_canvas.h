@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 #include "view/component.h"
 #include "view/shape/shape.h"
@@ -12,7 +13,6 @@
 
 namespace USTC_CG
 {
-
 // Canvas class for drawing shapes.
 class Canvas : public Component
 {
@@ -39,6 +39,9 @@ class Canvas : public Component
     std::vector<std::shared_ptr<Room>> room_list_;
     std::vector<std::shared_ptr<Obstacle>> obstacle_list_;
 	float cover_weight = 1.0f, size_weight = 1.0f;
+	std::map<int, int> adjacency_constraint;
+    // length of doors
+    float min_adjacency_length_w = 0.05f, min_adjacency_length_h = 0.05f;
 
    private:
     // Drawing functions.

@@ -23,5 +23,11 @@ class MIQP : public Window
 
     bool flag_show_canvas_view_ = true;
 	bool flag_show_room_view_ = true;
+    bool flag_show_aspect_ratio_ = true;
+    bool flag_show_size_ratio_ = true;
+	bool flag_show_position_constraint_ = true;
+	bool flag_show_adjacency_constraint_ = true;
+    bool flag_show_boundary_constraint_ = true;
+	int ad_idx1 = 0, ad_idx2 = 0;
 };
 }  // namespace USTC_CG
