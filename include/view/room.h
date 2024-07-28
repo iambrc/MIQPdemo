@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 namespace USTC_CG
 {
@@ -33,6 +34,7 @@ namespace USTC_CG
 		bool& get_has_ratio_constraint() { return has_ratio_constraint; }
 		bool& get_is_selected() { return is_selceted; }
 		float solved_w = -1.0f, solved_h = -1.0f, solved_x = -1.0f, solved_y = -1.0f;
+		std::vector<int> adjacency_list;
 
 	private:
 		float target_w_ = 0.0f, target_h_ = 0.0f;

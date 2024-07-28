@@ -166,12 +166,17 @@ void MIQP::draw_canvas()
         if (ImGui::Button("Add Adjacency Constraint") && ad_idx1 >=1 && ad_idx1 <= p_canvas_->room_num &&
             ad_idx2 >= 1 && ad_idx2 <= p_canvas_->room_num && ad_idx1 != ad_idx2)
 		{
-			p_canvas_->adjacency_constraint.insert(std::pair<int, int>(ad_idx1, ad_idx2));
-            std::cout << "Adjacency constraint of room " << ad_idx1 << "and room " << ad_idx2 << "has been added!" << std::endl;
+			int min_idx = std::min(ad_idx1, ad_idx2);
+			int max_idx = std::max(ad_idx1, ad_idx2);
+			p_canvas_->room_list_[min_idx - 1]->adjacency_list.push_back(max_idx);
+            std::cout << "Adjacency constraint of room " << ad_idx1 << " and room " << ad_idx2 << " has been added!" << std::endl;
         }
 		if (ImGui::Button("Clear Adjacency Constraint"))
         {
-			p_canvas_->adjacency_constraint.clear();
+			for (int i = 1; i <= p_canvas_->room_num; i++)
+            {
+				p_canvas_->room_list_[i - 1]->adjacency_list.clear();
+			}
 			std::cout << "All adjacency constraints have been cleared!" << std::endl;
 		}
         ImGui::SliderFloat("min adjacency length of width", &p_canvas_->min_adjacency_length_w, 0.0, 1.0);

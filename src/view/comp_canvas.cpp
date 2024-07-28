@@ -133,7 +133,7 @@ void Canvas::solve()
 		std::vector<std::vector<GRBVar>> adjacency(room_num, std::vector<GRBVar>(room_num));
 		for (int i = 1; i <= room_num; ++i)
 		{
-			for (int j = 1; j < i; ++j)
+			for (int j = 1; j <= room_num; ++j)
 			{
 				adjacency[i - 1][j - 1] = model.addVar(0, 1, 0, GRB_BINARY);
 			}
@@ -226,13 +226,16 @@ void Canvas::solve()
 			}
         }
 		// Adjacency constraint
-        for (auto it = adjacency_constraint.begin(); it != adjacency_constraint.end(); ++it)
+		for (int i = 1; i <= room_num; ++i)
         {
-			int idx1 = std::max(it->first, it->second) - 1, idx2 = std::min(it->first, it->second) - 1;
-            model.addConstr(x_i[idx1] <= x_i[idx2] + w_i[idx2] - min_adjacency_length_w * adjacency[idx1][idx2]);
-			model.addConstr(x_i[idx1] + w_i[idx1] >= x_i[idx2] + min_adjacency_length_w * adjacency[idx1][idx2]);
-			model.addConstr(y_i[idx1] <= y_i[idx2] + h_i[idx2] - min_adjacency_length_h * (1 - adjacency[idx1][idx2]));
-			model.addConstr(y_i[idx1] + h_i[idx1] >= y_i[idx2] + min_adjacency_length_h * (1 - adjacency[idx1][idx2]));
+            for (int j = 0; j < room_list_[i - 1]->adjacency_list.size(); ++j)
+            {
+                int idx1 = i - 1, idx2 = room_list_[i - 1]->adjacency_list[j] - 1;
+                model.addConstr(x_i[idx1] <= x_i[idx2] + w_i[idx2] - min_adjacency_length_w * adjacency[idx1][idx2]);
+                model.addConstr(x_i[idx1] + w_i[idx1] >= x_i[idx2] + min_adjacency_length_w * adjacency[idx1][idx2]);
+                model.addConstr(y_i[idx1] <= y_i[idx2] + h_i[idx2] - min_adjacency_length_h * (1 - adjacency[idx1][idx2]));
+                model.addConstr(y_i[idx1] + h_i[idx1] >= y_i[idx2] + min_adjacency_length_h * (1 - adjacency[idx1][idx2]));
+            }
         }
 		// Boundary constraint
         for (int i = 1; i <= room_num; ++i)
@@ -254,20 +257,20 @@ void Canvas::solve()
                     } 
                     else
                     {
-                        int ob_idx = std::floor(k / 4) - 1;
+                        int ob_idx = std::floor((k - 1) / 4) - 1;
                         if (k % 4 == 2)
                         {
                             x1 = obstacle_list_[ob_idx]->get_position_x();
                             x2 = obstacle_list_[ob_idx]->get_position_x() + obstacle_list_[ob_idx]->get_w();
                             y1 = obstacle_list_[ob_idx]->get_position_y() + obstacle_list_[ob_idx]->get_h();
-                            model.addConstr(y_i[i - 1] + h_i[i - 1] >= y1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
+                            model.addConstr(y_i[i - 1] <= y1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
                         }
-                        else if (k % 4 == 4)
+                        else if (k % 4 == 0)
                         {
                             x1 = obstacle_list_[ob_idx]->get_position_x();
                             x2 = obstacle_list_[ob_idx]->get_position_x() + obstacle_list_[ob_idx]->get_w();
                             y1 = obstacle_list_[ob_idx]->get_position_y();
-                            model.addConstr(y_i[i - 1] <= y1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
+                            model.addConstr(y_i[i - 1] + h_i[i - 1] >= y1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
                         }
                     }
                     model.addConstr(x_i[i - 1] <= x2 - w_i[i - 1] + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
@@ -297,20 +300,20 @@ void Canvas::solve()
                     }
                     else
                     {
-                        int ob_idx = std::floor(k / 4) - 1;
+                        int ob_idx = std::floor((k - 1) / 4) - 1;
                         if (k % 4 == 1)
                         {
                             x1 = obstacle_list_[ob_idx]->get_position_x();
                             y1 = obstacle_list_[ob_idx]->get_position_y();
                             y2 = obstacle_list_[ob_idx]->get_position_y() + obstacle_list_[ob_idx]->get_h();
-                            model.addConstr(x_i[i - 1] <= x1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
+                            model.addConstr(x_i[i - 1] + w_i[i - 1] >= x1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
                         }
                         else if (k % 4 == 3)
                         {
                             x1 = obstacle_list_[ob_idx]->get_position_x() + obstacle_list_[ob_idx]->get_w();
                             y1 = obstacle_list_[ob_idx]->get_position_y();
                             y2 = obstacle_list_[ob_idx]->get_position_y() + obstacle_list_[ob_idx]->get_h();
-                            model.addConstr(x_i[i - 1] + w_i[i - 1] >= x1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
+                            model.addConstr(x_i[i - 1] <= x1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
                         }
                     }
                     model.addConstr(y_i[i - 1] >= y1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
@@ -664,20 +667,20 @@ void Canvas::solve_sub_domain()
                     }
                     else
                     {
-                        int ob_idx = std::floor(k / 4) - 1;
+                        int ob_idx = std::floor((k - 1) / 4) - 1;
                         if (k % 4 == 2)
                         {
                             x1 = sub_obstacle_list_[ob_idx]->get_position_x();
                             x2 = sub_obstacle_list_[ob_idx]->get_position_x() + sub_obstacle_list_[ob_idx]->get_w();
                             y1 = sub_obstacle_list_[ob_idx]->get_position_y() + sub_obstacle_list_[ob_idx]->get_h();
-                            model.addConstr(y_i[i - 1] + h_i[i - 1] >= y1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
+                            model.addConstr(y_i[i - 1] <= y1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
                         }
-                        else if (k % 4 == 4)
+                        else if (k % 4 == 0)
                         {
                             x1 = sub_obstacle_list_[ob_idx]->get_position_x();
                             x2 = sub_obstacle_list_[ob_idx]->get_position_x() + sub_obstacle_list_[ob_idx]->get_w();
                             y1 = sub_obstacle_list_[ob_idx]->get_position_y();
-                            model.addConstr(y_i[i - 1] <= y1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
+                            model.addConstr(y_i[i - 1] + h_i[i - 1] >= y1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
                         }
                     }
                     model.addConstr(x_i[i - 1] <= x2 - w_i[i - 1] + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
@@ -707,20 +710,20 @@ void Canvas::solve_sub_domain()
                     }
                     else
                     {
-                        int ob_idx = std::floor(k / 4) - 1;
+                        int ob_idx = std::floor((k - 1) / 4) - 1;
                         if (k % 4 == 1)
                         {
                             x1 = sub_obstacle_list_[ob_idx]->get_position_x();
                             y1 = sub_obstacle_list_[ob_idx]->get_position_y();
                             y2 = sub_obstacle_list_[ob_idx]->get_position_y() + sub_obstacle_list_[ob_idx]->get_h();
-                            model.addConstr(x_i[i - 1] <= x1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
+                            model.addConstr(x_i[i - 1] + w_i[i - 1] >= x1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
                         }
                         else if (k % 4 == 3)
                         {
                             x1 = sub_obstacle_list_[ob_idx]->get_position_x() + sub_obstacle_list_[ob_idx]->get_w();
                             y1 = sub_obstacle_list_[ob_idx]->get_position_y();
                             y2 = sub_obstacle_list_[ob_idx]->get_position_y() + sub_obstacle_list_[ob_idx]->get_h();
-                            model.addConstr(x_i[i - 1] + w_i[i - 1] >= x1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
+                            model.addConstr(x_i[i - 1] <= x1 + (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.y / canvas_size_.x));
                         }
                     }
                     model.addConstr(y_i[i - 1] >= y1 - (1 - boundary[i - 1][k - 1]) * (1 + canvas_size_.x / canvas_size_.y));
