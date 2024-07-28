@@ -31,6 +31,8 @@ namespace USTC_CG
 		bool& get_has_boundary_constraint_w() { return has_boundary_constraint_w; }
 		bool& get_has_boundary_constraint_h() { return has_boundary_constraint_h; }
 		bool& get_has_ratio_constraint() { return has_ratio_constraint; }
+		bool& get_is_selected() { return is_selceted; }
+		float solved_w = -1.0f, solved_h = -1.0f, solved_x = -1.0f, solved_y = -1.0f;
 
 	private:
 		float target_w_ = 0.0f, target_h_ = 0.0f;
@@ -42,5 +44,6 @@ namespace USTC_CG
 		bool has_boundary_constraint_w = false;
 		bool has_boundary_constraint_h = false;
 		bool has_ratio_constraint = false;
+		bool is_selceted = false;
 	};
 }

@@ -37,8 +37,8 @@ void MIQP::draw_canvas()
         }
         ImGui::SliderFloat("cover weight", &p_canvas_->cover_weight, 0.0, 10.0);
 		ImGui::SliderFloat("size weight", &p_canvas_->size_weight, 0.0, 10.0);
-		ImGui::SliderFloat("min adjacency length", &p_canvas_->min_adjacency_length_w, 0.0, 1.0);
-		ImGui::SliderFloat("min adjacency length", &p_canvas_->min_adjacency_length_h, 0.0, 1.0);
+		//ImGui::SliderFloat("min adjacency length", &p_canvas_->min_adjacency_length_w, 0.0, 1.0);
+		//ImGui::SliderFloat("min adjacency length", &p_canvas_->min_adjacency_length_h, 0.0, 1.0);
 
         // Set the canvas to fill the rest of the window
         const auto& canvas_min = ImGui::GetCursorScreenPos();
@@ -174,6 +174,9 @@ void MIQP::draw_canvas()
 			p_canvas_->adjacency_constraint.clear();
 			std::cout << "All adjacency constraints have been cleared!" << std::endl;
 		}
+        ImGui::SliderFloat("min adjacency length of width", &p_canvas_->min_adjacency_length_w, 0.0, 1.0);
+        ImGui::SliderFloat("min adjacency length of height", &p_canvas_->min_adjacency_length_h, 0.0, 1.0);
+		ImGui::SliderFloat("min adjacency ratio of decomposed rooms", &p_canvas_->decompose_ratio, 0.0, 1.0);
     }
     ImGui::End();
 
@@ -192,5 +195,17 @@ void MIQP::draw_canvas()
 		}
     }
     ImGui::End();
+
+    if (ImGui::Begin("Sub-domain Optimization", &flag_show_sub_domain_))
+    {
+		ImGui::Checkbox("Enable selecting Sub-domain", &p_canvas_->enable_selection);
+        if (ImGui::Button("Solve Sub-domain"))
+        {
+			p_canvas_->solve_sub_domain();
+            std::cout << "Solve sub domain" << std::endl;
+        }
+        ImGui::SliderFloat("Refinement Range", &p_canvas_->refinement_range, 0.0, 0.1);
+    }
+	ImGui::End();
 }
 }  // namespace USTC_CG

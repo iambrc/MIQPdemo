@@ -34,6 +34,8 @@ class Canvas : public Component
 
 	// Solve the MIQP problem.
 	void solve();
+	// Solve sub domain MIQP problem.
+	void solve_sub_domain();
 
     int room_num = 0, obstacle_num = 0;
     std::vector<std::shared_ptr<Room>> room_list_;
@@ -42,11 +44,24 @@ class Canvas : public Component
 	std::map<int, int> adjacency_constraint;
     // length of doors
     float min_adjacency_length_w = 0.05f, min_adjacency_length_h = 0.05f;
+	float decompose_ratio = 0.5f;
+    // enable selection of sub domain
+	bool enable_selection = false;
+    // sub domain information
+	int sub_room_num = 0, sub_obstacle_num = 0;
+	std::vector<std::shared_ptr<Room>> sub_room_list_;
+	std::vector<std::shared_ptr<Obstacle>> sub_obstacle_list_;
+    float refinement_range = 0.05f;
 
    private:
     // Drawing functions.
     void draw_background();
     void draw_shapes();
+
+    // Event handlers for mouse interactions.
+	void mouse_click_event();
+    // Calculates mouse's relative position in the canvas.
+    ImVec2 mouse_pos_in_canvas() const;
 
     // Canvas attributes.
     ImVec2 canvas_min_;         // Top-left corner of the canvas.
